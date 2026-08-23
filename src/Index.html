@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <? if (current_track && current_track.image_url) { ?>
+    <title>▶ <?= current_track.name ?> - <?= current_track.artist ?> | Spotify Dashboard</title>
+    <link id="favicon" rel="icon" type="image/jpeg" href="<?= current_track.image_url ?>" />
+    <? } else { ?>
+    <title>Spotify Dashboard</title>
+    <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>" />
+    <? } ?>
+
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+      :root {
+        --bg-color: #0d0d0e;
+        --card-bg: rgba(24, 26, 28, 0.75);
+        --card-border: rgba(255, 255, 255, 0.08);
+        --spotify-green: #1db954;
+        --spotify-green-hover: #1ed760;
+        --spotify-green-glow: rgba(29, 185, 84, 0.4);
+        --text-primary: #ffffff;
+        --text-secondary: #b3b3b3;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: var(--bg-color);
+        background-image: radial-gradient(circle at 50% 0%, #1c2620 0%, var(--bg-color) 60%);
+        background-attachment: fixed;
+        color: var(--text-primary);
+        padding: 40px 20px;
+        margin: 0;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+
+      #wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      /* --- TOP HEADER & ACTIONS --- */
+      .main-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--card-border);
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .header-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin: 0;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--card-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease;
+      }
+      .action-btn:hover {
+        background: var(--spotify-green);
+        color: #000000;
+        border-color: var(--spotify-green);
+        box-shadow: 0 4px 14px var(--spotify-green-glow);
+        transform: translateY(-1px);
+      }
+
+      /* --- NOW PLAYING HEADER --- */
+      #now-playing-capture {
+        margin-bottom: 35px;
+      }
+
+      .badge-container {
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .badge {
+        font-family: 'Outfit', sans-serif;
+        background: var(--spotify-green);
+        color: #000000;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        box-shadow: 0 4px 14px var(--spotify-green-glow);
+      }
+      .badge-paused {
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--text-secondary);
+        box-shadow: none;
+      }
+
+      /* Equalizer Animation */
+      .equalizer {
+        display: inline-flex;
+        align-items: flex-end;
+        gap: 3px;
+        height: 14px;
+        margin-left: 10px;
+      }
+      .eq-bar {
+        width: 3px;
+        background-color: var(--spotify-green);
+        border-radius: 2px;
+        animation: eq-bounce 1.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+      }
+      .eq-bar-1 { height: 60%; animation-delay: 0.1s; }
+      .eq-bar-2 { height: 100%; animation-delay: 0.35s; }
+      .eq-bar-3 { height: 45%; animation-delay: 0.6s; }
+
+      @keyframes eq-bounce {
+        0% { height: 20%; }
+        100% { height: 100%; }
+      }
+
+      .now-playing-container {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        padding: 28px;
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid var(--card-border);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        transition: border-color 0.3s ease;
+      }
+
+      .now-playing-container:hover {
+        border-color: rgba(29, 185, 84, 0.3);
+      }
+
+      /* Empty State */
+      .empty-state-container {
+        padding: 36px 28px;
+      }
+      .empty-icon-wrapper {
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--card-border);
+        flex-shrink: 0;
+      }
+      .empty-music-icon {
+        font-size: 2.8rem;
+        animation: pulse-icon 2.5s ease-in-out infinite alternate;
+      }
+      @keyframes pulse-icon {
+        0% { transform: scale(0.95); opacity: 0.4; }
+        100% { transform: scale(1.05); opacity: 0.9; }
+      }
+      .empty-title {
+        font-size: 1.4rem !important;
+        color: var(--text-secondary) !important;
+      }
+      .empty-subtitle {
+        font-size: 0.9rem !important;
+        color: rgba(255, 255, 255, 0.4) !important;
+        margin-top: 6px !important;
+      }
+
+      /* Ambient Image Glow */
+      .now-playing-img-wrapper {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        flex-shrink: 0;
+      }
+      .now-playing-img-glow {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        filter: blur(22px);
+        opacity: 0.65;
+        transform: scale(0.95);
+        z-index: 1;
+      }
+      .now-playing-img {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        border-radius: 14px;
+        object-fit: cover;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+      .now-playing-container:hover .now-playing-img {
+        transform: scale(1.03);
+      }
+
+      .now-playing-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .now-playing-info h1 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        letter-spacing: -0.01em;
+      }
+
+      .now-playing-info p {
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+        margin: 2px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Progress Bar */
+      .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 14px 0 12px 0;
+        width: 100%;
+      }
+      .progress-time {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-family: monospace, SFMono-Regular, Consolas, sans-serif;
+        min-width: 40px;
+      }
+      .progress-bar-track {
+        flex: 1;
+        height: 6px;
+        background-color: rgba(255, 255, 255, 0.12);
+        border-radius: 3px;
+        overflow: hidden;
+        position: relative;
+      }
+      .progress-bar-fill {
+        height: 100%;
+        background-color: var(--spotify-green);
+        border-radius: 3px;
+        box-shadow: 0 0 10px var(--spotify-green-glow);
+        transition: width 0.1s linear;
+      }
+
+      /* Button Group */
+      .button-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 4px;
+        flex-wrap: wrap;
+      }
+
+      .now-playing-info a,
+      .now-playing-info .copy-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 18px;
+        border-radius: 20px;
+        border: 1px solid var(--spotify-green);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+        background: transparent;
+        color: var(--spotify-green);
+        cursor: pointer;
+      }
+      .now-playing-info a:hover,
+      .now-playing-info .copy-btn:hover {
+        background: var(--spotify-green);
+        color: #000000;
+        box-shadow: 0 4px 16px var(--spotify-green-glow);
+        transform: translateY(-1px);
+      }
+
+      /* --- TAB NAVIGATION & FILTERS --- */
+      .tab-nav-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--card-border);
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .tab-group {
+        display: flex;
+        gap: 8px;
+      }
+      .tab-btn {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        padding: 10px 18px;
+        background: transparent;
+        color: var(--text-secondary);
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .tab-btn:hover {
+        color: var(--text-primary);
+      }
+      .tab-btn.active {
+        color: var(--spotify-green);
+        border-bottom-color: var(--spotify-green);
+      }
+
+      .time-range-group {
+        display: flex;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 4px;
+        border-radius: 20px;
+        border: 1px solid var(--card-border);
+      }
+      .time-range-btn {
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 5px 14px;
+        border-radius: 16px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .time-range-btn.active {
+        background: var(--spotify-green);
+        color: #000000;
+        font-weight: 700;
+        box-shadow: 0 2px 8px var(--spotify-green-glow);
+      }
+
+      /* --- RECENTLY PLAYED & TOP GRID --- */
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+        width: 100%;
+      }
+
+      .card {
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-sizing: border-box;
+        position: relative;
+      }
+
+      .card:hover {
+        background: rgba(36, 39, 42, 0.9);
+        transform: translateY(-6px);
+        border-color: rgba(29, 185, 84, 0.35);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+      }
+
+      .card-img-wrapper {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 12px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        position: relative;
+      }
+
+      .card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .card:hover img {
+        transform: scale(1.06);
+      }
+
+      /* Rank Badges */
+      .rank-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 0.85rem;
+        padding: 2px 10px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      }
+      .rank-1 { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000000; }
+      .rank-2 { background: linear-gradient(135deg, #e0e0e0, #909090); color: #000000; }
+      .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #ffffff; }
+      .rank-other { background: rgba(0, 0, 0, 0.75); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2); }
+
+      /* 均等な高さ揃えのための固定行高さ設定 */
+      .card h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 4px 0;
+        line-height: 1.35;
+        height: 2.7em;
+        color: var(--text-primary);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .album-name {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin: 2px 0;
+        line-height: 1.35;
+        height: 1.35em;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .card p.artist-name {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin: 2px 0;
+        line-height: 1.35;
+        height: 1.35em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .card .played-at {
+        color: var(--spotify-green);
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin: 6px 0 14px 0;
+      }
+
+      /* ボタンエリアの統一（高さ・位置の完全垂直同期） */
+      .card-buttons {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .card-buttons a,
+      .card-buttons .copy-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--spotify-green);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid var(--spotify-green);
+        border-radius: 20px;
+        padding: 6px 0;
+        text-align: center;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        width: 100%;
+        margin-top: 0;
+      }
+
+      .card-buttons a:hover,
+      .card-buttons .copy-btn:hover {
+        background: var(--spotify-green);
+        color: #000000;
+        box-shadow: 0 4px 12px var(--spotify-green-glow);
+      }
+
+      /* Loading indicator */
+      .loading-message {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px 0;
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+      }
+
+      /* Toast */
+      #toast {
+        visibility: hidden;
+        min-width: 160px;
+        background-color: var(--spotify-green);
+        color: #000;
+        font-weight: bold;
+        font-size: 0.9rem;
+        text-align: center;
+        border-radius: 30px;
+        padding: 10px 20px;
+        position: fixed;
+        z-index: 2000;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        box-shadow: 0 8px 24px var(--spotify-green-glow);
+        opacity: 0;
+        transition: opacity 0.3s, bottom 0.3s;
+      }
+      #toast.show {
+        visibility: visible;
+        opacity: 1;
+        bottom: 50px;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+      // オンデマンド＆セッション内メモリキャッシュ
+      const _topTracksCache = {};
+      const _topArtistsCache = {};
+
+      let currentTab = 'recent'; // 'recent', 'top_tracks', 'top_artists'
+      let currentTimeRange = 'short_term'; // 'short_term', 'medium_term', 'long_term'
+
+      function switchTab(tabName) {
+        currentTab = tabName;
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.tab === tabName);
+        });
+
+        const timeRangeGroup = document.getElementById('time-range-group');
+        const recentGrid = document.getElementById('recent-grid');
+        const topTracksGrid = document.getElementById('top-tracks-grid');
+        const topArtistsGrid = document.getElementById('top-artists-grid');
+
+        if (tabName === 'recent') {
+          timeRangeGroup.style.display = 'none';
+          recentGrid.style.display = 'grid';
+          topTracksGrid.style.display = 'none';
+          topArtistsGrid.style.display = 'none';
+        } else if (tabName === 'top_tracks') {
+          timeRangeGroup.style.display = 'flex';
+          recentGrid.style.display = 'none';
+          topTracksGrid.style.display = 'grid';
+          topArtistsGrid.style.display = 'none';
+          loadTopTracks(currentTimeRange);
+        } else if (tabName === 'top_artists') {
+          timeRangeGroup.style.display = 'flex';
+          recentGrid.style.display = 'none';
+          topTracksGrid.style.display = 'none';
+          topArtistsGrid.style.display = 'grid';
+          loadTopArtists(currentTimeRange);
+        }
+      }
+
+      function switchTimeRange(timeRange) {
+        currentTimeRange = timeRange;
+        document.querySelectorAll('.time-range-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.range === timeRange);
+        });
+
+        if (currentTab === 'top_tracks') {
+          loadTopTracks(timeRange);
+        } else if (currentTab === 'top_artists') {
+          loadTopArtists(timeRange);
+        }
+      }
+
+      async function loadTopTracks(timeRange) {
+        const container = document.getElementById('top-tracks-grid');
+        if (_topTracksCache[timeRange]) {
+          renderTopTracks(_topTracksCache[timeRange], container);
+          return;
+        }
+
+        container.innerHTML = '<div class="loading-message">🔥 Loading Top Tracks...</div>';
+        try {
+          const data = await new Promise((resolve, reject) => {
+            google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).apiTopTracks(timeRange);
+          });
+          if (data.tracks) {
+            _topTracksCache[timeRange] = data.tracks;
+            renderTopTracks(data.tracks, container);
+          } else {
+            container.innerHTML = '<div class="loading-message">Failed to load data</div>';
+          }
+        } catch (err) {
+          console.error(err);
+          container.innerHTML = '<div class="loading-message">Error loading tracks</div>';
+        }
+      }
+
+      function getRankBadgeClass(rank) {
+        if (rank === 1) return 'rank-1';
+        if (rank === 2) return 'rank-2';
+        if (rank === 3) return 'rank-3';
+        return 'rank-other';
+      }
+
+      function renderTopTracks(tracks, container) {
+        if (!tracks || tracks.length === 0) {
+          container.innerHTML = '<div class="loading-message">No tracks found</div>';
+          return;
+        }
+
+        container.innerHTML = tracks.map(track => `
+          <div class="card">
+            <span class="rank-badge ${getRankBadgeClass(track.rank)}">#${track.rank}</span>
+            ${track.image_url ? `
+            <div class="card-img-wrapper">
+              <img src="${track.image_url}" alt="${track.album}" loading="lazy" />
+            </div>` : ''}
+            <h3>${track.name}</h3>
+            <p class="album-name">${track.album}</p>
+            <p class="artist-name">${track.artist}</p>
+            <div class="card-buttons">
+              <a href="${track.url}" target="_blank">Listen on Spotify ↗</a>
+              <button
+                class="copy-btn"
+                onclick="copyToClipboard('${escapeJs(track.name)}', '${escapeJs(track.artist)}', '${escapeJs(track.album)}', '${escapeJs(track.url)}', this)"
+              >
+                Copy Link
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      async function loadTopArtists(timeRange) {
+        const container = document.getElementById('top-artists-grid');
+        if (_topArtistsCache[timeRange]) {
+          renderTopArtists(_topArtistsCache[timeRange], container);
+          return;
+        }
+
+        container.innerHTML = '<div class="loading-message">🎤 Loading Top Artists...</div>';
+        try {
+          const data = await new Promise((resolve, reject) => {
+            google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).apiTopArtists(timeRange);
+          });
+          if (data.artists) {
+            _topArtistsCache[timeRange] = data.artists;
+            renderTopArtists(data.artists, container);
+          } else {
+            container.innerHTML = '<div class="loading-message">Failed to load data</div>';
+          }
+        } catch (err) {
+          console.error(err);
+          container.innerHTML = '<div class="loading-message">Error loading artists</div>';
+        }
+      }
+
+      function renderTopArtists(artists, container) {
+        if (!artists || artists.length === 0) {
+          container.innerHTML = '<div class="loading-message">No artists found</div>';
+          return;
+        }
+
+        container.innerHTML = artists.map(artist => `
+          <div class="card">
+            <span class="rank-badge ${getRankBadgeClass(artist.rank)}">#${artist.rank}</span>
+            ${artist.image_url ? `
+            <div class="card-img-wrapper">
+              <img src="${artist.image_url}" alt="${artist.name}" loading="lazy" />
+            </div>` : ''}
+            <h3>${artist.name}</h3>
+            <p class="album-name">Genre: ${artist.genre}</p>
+            <p class="artist-name">Artist Rank #${artist.rank}</p>
+            <div class="card-buttons">
+              <a href="${artist.url}" target="_blank">Listen on Spotify ↗</a>
+              <button
+                class="copy-btn"
+                onclick="copyToClipboard('${escapeJs(artist.name)}', 'Artist', '${escapeJs(artist.genre)}', '${escapeJs(artist.url)}', this)"
+              >
+                Copy Link
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function escapeJs(str) {
+        return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      }
+
+      function copyCanvasToClipboard(canvas, successToastMsg) {
+        if (!navigator.clipboard) {
+          showToast('Clipboard API is restricted on non-HTTPS connection.');
+          return;
+        }
+
+        try {
+          const blobPromise = new Promise((resolve, reject) => {
+            canvas.toBlob((blob) => {
+              if (blob) resolve(blob);
+              else reject(new Error('Canvas blob generation failed'));
+            }, 'image/png');
+          });
+
+          if (typeof ClipboardItem !== 'undefined') {
+            const item = new ClipboardItem({ 'image/png': blobPromise });
+            navigator.clipboard.write([item]).then(() => {
+              showToast(successToastMsg);
+            }).catch((err) => {
+              console.error('Clipboard write promise failed:', err);
+              blobPromise.then((blob) => {
+                const fallbackItem = new ClipboardItem({ 'image/png': blob });
+                return navigator.clipboard.write([fallbackItem]);
+              }).then(() => {
+                showToast(successToastMsg);
+              }).catch((e) => {
+                console.error('Fallback clipboard write error:', e);
+                showToast('Clipboard write failed.');
+              });
+            });
+          } else {
+            showToast('Browser image clipboard copy is !supported.');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('An error occurred during copy.');
+        }
+      }
+
+      function captureElement(elementId) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        showToast('Capturing image...');
+        html2canvas(element, {
+          backgroundColor: '#0d0d0e',
+          scale: 2,
+          useCORS: true,
+        }).then((canvas) => {
+          copyCanvasToClipboard(canvas, 'Now Playing image copied!');
+        }).catch((err) => {
+          console.error(err);
+          showToast('Image generation error.');
+        });
+      }
+
+      function captureHistoryThreeRows(elementId) {
+        const wrapper = document.getElementById(elementId);
+        if (!wrapper) return;
+
+        showToast('Capturing history image...');
+        const clone = wrapper.cloneNode(true);
+
+        const header = clone.querySelector('.main-header');
+        if (header) header.remove();
+
+        const nowPlaying = clone.querySelector('#now-playing-capture');
+        if (nowPlaying) nowPlaying.remove();
+
+        const tabNav = clone.querySelector('.tab-nav-container');
+        if (tabNav) tabNav.remove();
+
+        const grid = clone.querySelector('.grid-container:not([style*="display: none"])') || clone.querySelector('#recent-grid');
+        if (grid) {
+          const cards = grid.querySelectorAll('.card');
+          cards.forEach((card, index) => {
+            if (index >= 15) card.remove();
+          });
+        }
+
+        clone.style.position = 'absolute';
+        clone.style.top = '-9999px';
+        clone.style.left = '-9999px';
+        clone.style.zIndex = '-99999';
+        clone.style.opacity = '1';
+        clone.style.visibility = 'visible';
+        clone.style.pointerEvents = 'none';
+        clone.style.width = wrapper.offsetWidth + 'px';
+        clone.style.padding = '20px';
+        document.body.appendChild(clone);
+
+        html2canvas(clone, {
+          backgroundColor: '#0d0d0e',
+          scale: 2,
+          useCORS: true,
+        }).then((canvas) => {
+          if (document.body.contains(clone)) document.body.removeChild(clone);
+          copyCanvasToClipboard(canvas, 'History image copied!');
+        }).catch((err) => {
+          console.error(err);
+          if (document.body.contains(clone)) document.body.removeChild(clone);
+          showToast('Image generation error.');
+        });
+      }
+
+      async function copyToClipboard(trackName, artistName, albumName, trackUrl, btnElement) {
+        const originalText = btnElement.innerText;
+        const textToCopy = `${trackName} / ${artistName} - ${albumName}\n${trackUrl}`;
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          btnElement.innerText = "Copied!";
+          btnElement.style.background = "#1db954";
+          btnElement.style.color = "black";
+          setTimeout(() => {
+            btnElement.innerText = originalText;
+            btnElement.style.background = "transparent";
+            btnElement.style.color = "#1db954";
+          }, 1500);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.innerText = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2500);
+      }
+
+      document.addEventListener('DOMContentLoaded', function initSeekBarTicker() {
+        const container = document.getElementById('progress-container');
+        if (!container) return;
+
+        const currentEl = document.getElementById('progress-current-time');
+        const fillEl = document.getElementById('progress-bar-fill');
+
+        const startProgressMs = parseInt(container.dataset.progressMs || '0', 10);
+        const durationMs = parseInt(container.dataset.durationMs || '0', 10);
+        const isPlaying = container.dataset.isPlaying === 'true';
+
+        if (!isPlaying || durationMs <= 0) return;
+
+        const startTime = Date.now();
+        let reloadScheduled = false;
+
+        function formatTime(ms) {
+          const totalSecs = Math.max(0, Math.floor(ms / 1000));
+          const mins = Math.floor(totalSecs / 60);
+          const secs = totalSecs % 60;
+          return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+        }
+
+        function update() {
+          const elapsed = Date.now() - startTime;
+          const currentMs = Math.min(durationMs, startProgressMs + elapsed);
+          const percent = Math.min(100, (currentMs / durationMs) * 100);
+
+          if (fillEl) fillEl.style.width = percent.toFixed(2) + '%';
+          if (currentEl) currentEl.innerText = formatTime(currentMs);
+
+          if (currentMs < durationMs) {
+            requestAnimationFrame(update);
+          } else if (!reloadScheduled) {
+            reloadScheduled = true;
+            // 楽曲が終了（100%到達）してから 5 秒後に自動リロード
+            setTimeout(() => {
+              window.location.reload();
+            }, 5000);
+          }
+        }
+
+        requestAnimationFrame(update);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="toast">Copied.</div>
+    <div id="wrapper">
+      <!-- TOP HEADER & ACTION BAR -->
+      <header class="main-header">
+        <h1 class="header-title">🎵 Spotify Dashboard</h1>
+        <div class="header-actions">
+          <? if (current_track) { ?>
+          <button class="action-btn" onclick="captureElement('now-playing-capture')">
+            📸 Copy Now Playing
+          </button>
+          <? } ?>
+          <button class="action-btn" onclick="captureHistoryThreeRows('wrapper')">
+            📷 Copy History
+          </button>
+        </div>
+      </header>
+
+      <? if (current_track) { ?>
+      <!-- NOW PLAYING (ACTIVE) -->
+      <div id="now-playing-capture">
+        <div class="badge-container">
+          <span class="badge">NOW PLAYING</span>
+          <div class="equalizer">
+            <span class="eq-bar eq-bar-1"></span>
+            <span class="eq-bar eq-bar-2"></span>
+            <span class="eq-bar eq-bar-3"></span>
+          </div>
+        </div>
+        <div class="now-playing-container">
+          <div class="now-playing-img-wrapper">
+            <img src="<?= current_track.image_url ?>" class="now-playing-img-glow" alt="" />
+            <img src="<?= current_track.image_url ?>" class="now-playing-img" alt="<?= current_track.album ?>" />
+          </div>
+          <div class="now-playing-info">
+            <h1><?= current_track.name ?></h1>
+            <p><?= current_track.album ?></p>
+            <p><?= current_track.artist ?></p>
+            <div
+              class="progress-container"
+              id="progress-container"
+              data-progress-ms="<?= current_track.progress_ms ?>"
+              data-duration-ms="<?= current_track.duration_ms ?>"
+              data-is-playing="<?= current_track.is_playing ? 'true' : 'false' ?>"
+            >
+              <span class="progress-time" id="progress-current-time"><?= current_track.progress_str ?></span>
+              <div class="progress-bar-track">
+                <div
+                  class="progress-bar-fill"
+                  id="progress-bar-fill"
+                  style="width: <?= current_track.progress_percent ?>%;"
+                ></div>
+              </div>
+              <span class="progress-time"><?= current_track.duration_str ?></span>
+            </div>
+            <div class="button-group">
+              <a href="<?= current_track.url ?>" target="_blank">Listen on Spotify ↗</a>
+              <button
+                class="copy-btn"
+                onclick="copyToClipboard('<?= current_track.name ?>', '<?= current_track.artist ?>', '<?= current_track.album ?>', '<?= current_track.url ?>', this)"
+              >
+                Copy Link
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <? } else { ?>
+      <!-- NOW PLAYING (EMPTY / PAUSED STATE) -->
+      <div id="now-playing-capture">
+        <div class="badge-container">
+          <span class="badge badge-paused">PAUSED / IDLE</span>
+        </div>
+        <div class="now-playing-container empty-state-container">
+          <div class="empty-icon-wrapper">
+            <span class="empty-music-icon">🎵</span>
+          </div>
+          <div class="now-playing-info">
+            <h1 class="empty-title">Nothing Currently Playing</h1>
+            <p class="empty-subtitle">Play a song on Spotify to see real-time updates.</p>
+          </div>
+        </div>
+      </div>
+      <? } ?>
+
+      <!-- TAB NAVIGATION & TIME RANGE FILTERS -->
+      <div class="tab-nav-container">
+        <div class="tab-group">
+          <button class="tab-btn active" data-tab="recent" onclick="switchTab('recent')">🕒 Recently Played</button>
+          <button class="tab-btn" data-tab="top_tracks" onclick="switchTab('top_tracks')">🔥 Top Tracks</button>
+          <button class="tab-btn" data-tab="top_artists" onclick="switchTab('top_artists')">🎤 Top Artists</button>
+        </div>
+        <div class="time-range-group" id="time-range-group" style="display: none;">
+          <button class="time-range-btn active" data-range="short_term" onclick="switchTimeRange('short_term')">⚡️ Last 4 Weeks</button>
+          <button class="time-range-btn" data-range="medium_term" onclick="switchTimeRange('medium_term')">📅 Last 6 Months</button>
+          <button class="time-range-btn" data-range="long_term" onclick="switchTimeRange('long_term')">🏆 All Time</button>
+        </div>
+      </div>
+
+      <!-- RECENTLY PLAYED GRID -->
+      <div class="grid-container" id="recent-grid">
+        <? for (let i=0; i < tracks.length; i++) { let track = tracks[i]; ?>
+        <div class="card">
+          <? if (track.image_url) { ?>
+          <div class="card-img-wrapper">
+            <img src="<?= track.image_url ?>" alt="<?= track.album ?>" loading="lazy" />
+          </div>
+          <? } ?>
+          <h3><?= track.name ?></h3>
+          <p class="album-name"><?= track.album ?></p>
+          <p class="artist-name"><?= track.artist ?></p>
+          <p class="played-at">🕒 <?= track.played_at ?></p>
+          <div class="card-buttons">
+            <a href="<?= track.url ?>" target="_blank">Listen on Spotify ↗</a>
+            <button
+              class="copy-btn"
+              onclick="copyToClipboard('<?= track.name ?>', '<?= track.artist ?>', '<?= track.album ?>', '<?= track.url ?>', this)"
+            >
+              Copy Link
+            </button>
+          </div>
+        </div>
+        <? } ?>
+      </div>
+
+      <!-- TOP TRACKS GRID (LAZY LOADED & CACHED) -->
+      <div class="grid-container" id="top-tracks-grid" style="display: none;"></div>
+
+      <!-- TOP ARTISTS GRID (LAZY LOADED & CACHED) -->
+      <div class="grid-container" id="top-artists-grid" style="display: none;"></div>
+    </div>
+  </body>
+</html>

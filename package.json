@@ -1,0 +1,15 @@
+{
+  "name": "spotinow-gas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Spotify NowPlaying Dashboard on Google Apps Script",
+  "scripts": {
+    "check": "node --check src/Code.js && node -e \"JSON.parse(require('node:fs').readFileSync('src/appsscript.json'))\"",
+    "push": "clasp push",
+    "open": "clasp open"
+  },
+  "devDependencies": {
+    "@google/clasp": "^2.4.2"
+  },
+  "license": "MIT"
+}

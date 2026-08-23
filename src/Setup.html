@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spotify Dashboard - GAS Setup</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #121212;
+        color: #ffffff;
+        margin: 0;
+        padding: 40px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+      .setup-card {
+        background: #181818;
+        border: 1px solid #282828;
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 540px;
+        width: 100%;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+        text-align: center;
+      }
+      .header h1 { font-size: 1.8rem; margin: 0 0 8px 0; color: #ffffff; }
+      .header p { color: #b3b3b3; font-size: 0.95rem; margin: 0 0 32px 0; }
+      .btn-spotify {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #1db954;
+        color: #000000;
+        font-weight: bold;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .btn-spotify:hover { background-color: #1ed760; transform: scale(1.02); }
+      .error-msg { background: rgba(230, 57, 70, 0.15); border: 1px solid #e63946; color: #ff6b6b; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px; }
+      .success-msg { background: rgba(29, 185, 84, 0.15); border: 1px solid #1db954; color: #1db954; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px; }
+    </style>
+  </head>
+  <body>
+    <div class="setup-card">
+      <div class="header">
+        <h1>🎵 Spotify Dashboard</h1>
+        <p>GAS 初回認証セットアップ</p>
+      </div>
+
+      <? if (typeof error !== 'undefined' && error) { ?>
+      <div class="error-msg">⚠️ <?= error ?></div>
+      <? } ?>
+
+      <? if (isConfigured) { ?>
+      <div class="success-msg">✅ 認証済みです。</div>
+      <a href="<?= ScriptApp.getService().getUrl() ?>" class="btn-spotify" style="background-color:#ffffff;">ダッシュボードへ</a>
+      <br><br>
+      <a href="<?= authUrl ?>" style="color:#b3b3b3; font-size:0.8rem;">再認証する</a>
+      <? } else { ?>
+      <p style="font-size: 0.85rem; color: #b3b3b3; margin-bottom: 24px; text-align: left;">
+        ※ 事前に Script Properties に <code>SPOTIFY_CLIENT_ID</code> と <code>SPOTIFY_CLIENT_SECRET</code> を設定し、Spotify Dashboard の Redirect URI にこの Web App の URL を登録してください。
+      </p>
+      <a href="<?= authUrl ?>" class="btn-spotify">Spotify で認証する</a>
+      <? } ?>
+    </div>
+  </body>
+</html>

@@ -40,7 +40,7 @@ function doGet(e) {
     template.error = err.toString();
   }
 
-  return template.evaluate()
+  return template.evaluate().setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .setTitle('Spotify Dashboard')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }

@@ -953,7 +953,7 @@
 
         tickerFrameId = requestAnimationFrame(update);
       }
-      document.addEventListener('DOMContentLoaded', initSeekBarTicker); setTimeout(initSeekBarTicker, 100);
+      document.addEventListener('DOMContentLoaded', initSeekBarTicker); window.addEventListener('load', initSeekBarTicker);
     </script>
   </head>
   <body>
@@ -1087,5 +1087,10 @@
       <!-- TOP ARTISTS GRID (LAZY LOADED & CACHED) -->
       <div class="grid-container" id="top-artists-grid" style="display: none;"></div>
     </div>
-  </body>
+  
+    <script>
+      // Fallback initialization just in case
+      initSeekBarTicker();
+    </script>
+</body>
 </html>

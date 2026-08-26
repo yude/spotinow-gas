@@ -869,7 +869,44 @@
         }, 2500);
       }
 
-      document.addEventListener('DOMContentLoaded', function initSeekBarTicker() {
+      
+      async function reloadDashboardSeamlessly() {
+        try {
+          const newHtml = await new Promise((resolve, reject) => {
+            google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).apiGetDashboardHtml();
+          });
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(newHtml, 'text/html');
+          
+          document.title = doc.title;
+          const favicon = document.getElementById('favicon');
+          const newFavicon = doc.getElementById('favicon');
+          if (favicon && newFavicon) favicon.href = newFavicon.href;
+          
+          const wrapper = document.getElementById('wrapper');
+          const newWrapper = doc.getElementById('wrapper');
+          if (wrapper && newWrapper) {
+            // 現在のタブの状態を保持
+            const activeTab = currentTab || 'recent';
+            const activeTimeRange = currentTimeRange || 'short_term';
+            
+            wrapper.innerHTML = newWrapper.innerHTML;
+            
+            // タブの状態を復元
+            if (activeTab !== 'recent') {
+              switchTab(activeTab);
+              switchTimeRange(activeTimeRange);
+            }
+          }
+          
+          initSeekBarTicker();
+        } catch (err) {
+          console.error(err);
+          window.location.replace('<?= ScriptApp.getService().getUrl() ?>');
+        }
+      }
+
+      function initSeekBarTicker() {
         const container = document.getElementById('progress-container');
         if (!container) return;
 
@@ -905,14 +942,13 @@
           } else if (!reloadScheduled) {
             reloadScheduled = true;
             // 楽曲が終了（100%到達）してから 5 秒後に自動リロード
-            setTimeout(() => {
-              window.location.reload();
-            }, 5000);
+            setTimeout(() => { reloadDashboardSeamlessly(); }, 5000);
           }
         }
 
         requestAnimationFrame(update);
-      });
+      }
+      document.addEventListener('DOMContentLoaded', initSeekBarTicker);
     </script>
   </head>
   <body>

@@ -296,3 +296,18 @@ function apiTopArtists(timeRange) {
   cache.put(cacheKey, JSON.stringify(artists), 3600);
   return { artists: artists, cached: false };
 }
+
+
+function apiGetDashboardHtml() {
+  const template = HtmlService.createTemplateFromFile('Index');
+  try {
+    const data = fetchSpotifyData_();
+    template.current_track = data.current_track;
+    template.tracks = data.history;
+  } catch (err) {
+    template.current_track = null;
+    template.tracks = [];
+    template.error = err.toString();
+  }
+  return template.evaluate().getContent();
+}

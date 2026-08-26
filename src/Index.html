@@ -909,7 +909,7 @@
       let tickerFrameId = null;
       let tickerTimeoutId = null;
 
-      function initSeekBarTicker() {
+      function initSeekBarTicker() { console.log('initSeekBarTicker called');
         if (tickerFrameId) cancelAnimationFrame(tickerFrameId);
         if (tickerTimeoutId) clearTimeout(tickerTimeoutId);
         const container = document.getElementById('progress-container');
@@ -953,7 +953,7 @@
 
         tickerFrameId = requestAnimationFrame(update);
       }
-      document.addEventListener('DOMContentLoaded', initSeekBarTicker);
+      document.addEventListener('DOMContentLoaded', initSeekBarTicker); setTimeout(initSeekBarTicker, 100);
     </script>
   </head>
   <body>

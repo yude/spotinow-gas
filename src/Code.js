@@ -315,5 +315,5 @@ function apiGetDashboardHtml() {
 // Escapes strings for safe injection into inline JavaScript within the GAS template
 function escapeGas(str) {
   if (!str) return '';
-  return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
 }

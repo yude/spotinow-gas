@@ -906,7 +906,12 @@
         }
       }
 
+      let tickerFrameId = null;
+      let tickerTimeoutId = null;
+
       function initSeekBarTicker() {
+        if (tickerFrameId) cancelAnimationFrame(tickerFrameId);
+        if (tickerTimeoutId) clearTimeout(tickerTimeoutId);
         const container = document.getElementById('progress-container');
         if (!container) return;
 
@@ -935,18 +940,18 @@
           const percent = Math.min(100, (currentMs / durationMs) * 100);
 
           if (fillEl) fillEl.style.width = percent.toFixed(2) + '%';
-          if (currentEl) currentEl.innerText = formatTime(currentMs);
+          if (currentEl) { currentEl.innerText = (currentMs >= durationMs) ? 'Wait...' : formatTime(currentMs); }
 
           if (currentMs < durationMs) {
-            requestAnimationFrame(update);
+            tickerFrameId = requestAnimationFrame(update);
           } else if (!reloadScheduled) {
             reloadScheduled = true;
             // 楽曲が終了（100%到達）してから 5 秒後に自動リロード
-            setTimeout(() => { reloadDashboardSeamlessly(); }, 5000);
+            tickerTimeoutId = setTimeout(() => { reloadDashboardSeamlessly(); }, 5000);
           }
         }
 
-        requestAnimationFrame(update);
+        tickerFrameId = requestAnimationFrame(update);
       }
       document.addEventListener('DOMContentLoaded', initSeekBarTicker);
     </script>

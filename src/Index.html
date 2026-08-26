@@ -923,15 +923,12 @@
         const isPlaying = container.getAttribute('data-is-playing') === 'true';
 
         
-        console.log('StartMs:', startProgressMs, 'DurationMs:', durationMs, 'isPlaying:', isPlaying);
-        if (!isPlaying || durationMs <= 0) {
-          console.log('Skipping animation. isPlaying is', isPlaying, 'and durationMs is', durationMs);
-          return;
+                if (!isPlaying || durationMs <= 0) {
+                    return;
         }
 
 
-        const startTime = Date.now(); console.log('Ticker starting. Duration:', durationMs, 'Current:', startProgressMs);
-        let reloadScheduled = false;
+        const startTime = Date.now();         let reloadScheduled = false;
 
         function formatTime(ms) {
           const totalSecs = Math.max(0, Math.floor(ms / 1000));
@@ -940,13 +937,9 @@
           return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
         }
 
-        let frameCount = 0;
-        function update() {
-          frameCount++;
-          if (frameCount % 120 === 0) console.log('Ticker running...', startProgressMs + (Date.now() - startTime), '/', durationMs);
-          if (!document.body.contains(container)) {
-             console.log('Container detached, stopping animation loop');
-             return;
+                function update() {
+                              if (!document.body.contains(container)) {
+                          return;
           }
           const elapsed = Date.now() - startTime;
           const currentMs = Math.min(durationMs, startProgressMs + elapsed);
@@ -973,8 +966,7 @@
       const observer = new MutationObserver((mutations, obs) => {
         if (document.getElementById('progress-container')) {
           if (!tickerFrameId) {
-            console.log('MutationObserver detected progress-container, initializing ticker...');
-            initSeekBarTicker();
+                        initSeekBarTicker();
           }
           obs.disconnect();
         }

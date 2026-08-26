@@ -1038,7 +1038,7 @@
               <a href="<?= current_track.url ?>" target="_blank">Listen on Spotify ↗</a>
               <button
                 class="copy-btn"
-                onclick="copyToClipboard('<?= (current_track.name || '').replace(/'/g, \"\\'\").replace(/"/g, '&quot;') ?>', '<?= (current_track.artist || '').replace(/'/g, \"\\'\").replace(/"/g, '&quot;') ?>', '<?= (current_track.album || '').replace(/'/g, \"\\'\").replace(/"/g, '&quot;') ?>', '<?= (current_track.url || '').replace(/'/g, \"\\'\").replace(/"/g, '&quot;') ?>', this)"
+                onclick="copyToClipboard('<?= escapeGas(current_track.name) ?>', '<?= escapeGas(current_track.artist) ?>', '<?= escapeGas(current_track.album) ?>', '<?= escapeGas(current_track.url) ?>', this)"
               >
                 Copy Link
               </button>
@@ -1095,7 +1095,7 @@
             <a href="<?= track.url ?>" target="_blank">Listen on Spotify ↗</a>
             <button
               class="copy-btn"
-              onclick="copyToClipboard('<?= (track.name || '').replace(/'/g, \"\\'\").replace(/"/g, '&quot;') ?>', '<?= (track.artist || '').replace(/'/g, \"\\'\").replace(/"/g, '&quot;') ?>', '<?= (track.album || '').replace(/'/g, \"\\'\").replace(/"/g, '&quot;') ?>', '<?= (track.url || '').replace(/'/g, \"\\'\").replace(/"/g, '&quot;') ?>', this)"
+              onclick="copyToClipboard('<?= escapeGas(track.name) ?>', '<?= escapeGas(track.artist) ?>', '<?= escapeGas(track.album) ?>', '<?= escapeGas(track.url) ?>', this)"
             >
               Copy Link
             </button>

@@ -311,3 +311,9 @@ function apiGetDashboardHtml() {
   }
   return template.evaluate().getContent();
 }
+
+// Escapes strings for safe injection into inline JavaScript within the GAS template
+function escapeGas(str) {
+  if (!str) return '';
+  return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}

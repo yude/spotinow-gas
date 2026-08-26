@@ -902,7 +902,7 @@
           initSeekBarTicker();
         } catch (err) {
           console.error(err);
-          window.location.replace('<?= ScriptApp.getService().getUrl() ?>');
+          window.location.reload();
         }
       }
 

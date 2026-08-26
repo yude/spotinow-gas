@@ -918,9 +918,9 @@
         const currentEl = document.getElementById('progress-current-time');
         const fillEl = document.getElementById('progress-bar-fill');
 
-        const startProgressMs = parseInt(container.dataset.progressMs || '0', 10);
-        const durationMs = parseInt(container.dataset.durationMs || '0', 10);
-        const isPlaying = container.dataset.isPlaying === 'true';
+        const startProgressMs = parseInt(container.getAttribute('data-progress-ms') || '0', 10);
+        const durationMs = parseInt(container.getAttribute('data-duration-ms') || '0', 10);
+        const isPlaying = container.getAttribute('data-is-playing') === 'true';
 
         
         console.log('StartMs:', startProgressMs, 'DurationMs:', durationMs, 'isPlaying:', isPlaying);

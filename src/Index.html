@@ -924,7 +924,7 @@
 
         if (!isPlaying || durationMs <= 0) return;
 
-        const startTime = Date.now();
+        const startTime = Date.now(); console.log('Ticker starting. Duration:', durationMs, 'Current:', startProgressMs);
         let reloadScheduled = false;
 
         function formatTime(ms) {

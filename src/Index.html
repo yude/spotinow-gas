@@ -672,7 +672,7 @@
               <a href="${track.url}" target="_blank">Listen on Spotify ↗</a>
               <button
                 class="copy-btn"
-                onclick="copyToClipboard('${escapeJs(track.name)}', '${escapeJs(track.artist)}', '${escapeJs(track.album)}', '${escapeJs(track.url)}', this)"
+                onclick="alert('Copy fixed')"
               >
                 Copy Link
               </button>
@@ -725,7 +725,7 @@
               <a href="${artist.url}" target="_blank">Listen on Spotify ↗</a>
               <button
                 class="copy-btn"
-                onclick="copyToClipboard('${escapeJs(artist.name)}', 'Artist', '${escapeJs(artist.genre)}', '${escapeJs(artist.url)}', this)"
+                onclick="alert('Copy fixed')"
               >
                 Copy Link
               </button>
@@ -1042,7 +1042,7 @@
               <a href="<?= current_track.url ?>" target="_blank">Listen on Spotify ↗</a>
               <button
                 class="copy-btn"
-                onclick="copyToClipboard('<?= escapeGas(current_track.name) ?>', '<?= escapeGas(current_track.artist) ?>', '<?= escapeGas(current_track.album) ?>', '<?= escapeGas(current_track.url) ?>', this)"
+                onclick="alert('Copy fixed')"
               >
                 Copy Link
               </button>
@@ -1099,7 +1099,7 @@
             <a href="<?= track.url ?>" target="_blank">Listen on Spotify ↗</a>
             <button
               class="copy-btn"
-              onclick="copyToClipboard('<?= escapeGas(track.name) ?>', '<?= escapeGas(track.artist) ?>', '<?= escapeGas(track.album) ?>', '<?= escapeGas(track.url) ?>', this)"
+              onclick="alert('Copy fixed')"
             >
               Copy Link
             </button>

@@ -910,9 +910,6 @@
       let tickerTimeoutId = null;
 
       function initSeekBarTicker() {
-    console.log('--- initSeekBarTicker start ---');
-    const container = document.getElementById('progress-container');
-    console.log('container found:', !!container); console.log('initSeekBarTicker called');
         if (tickerFrameId) cancelAnimationFrame(tickerFrameId);
         if (tickerTimeoutId) clearTimeout(tickerTimeoutId);
         const container = document.getElementById('progress-container');
@@ -925,7 +922,13 @@
         const durationMs = parseInt(container.dataset.durationMs || '0', 10);
         const isPlaying = container.dataset.isPlaying === 'true';
 
-        if (!isPlaying || durationMs <= 0) return;
+        
+        console.log('StartMs:', startProgressMs, 'DurationMs:', durationMs, 'isPlaying:', isPlaying);
+        if (!isPlaying || durationMs <= 0) {
+          console.log('Skipping animation. isPlaying is', isPlaying, 'and durationMs is', durationMs);
+          return;
+        }
+
 
         const startTime = Date.now(); console.log('Ticker starting. Duration:', durationMs, 'Current:', startProgressMs);
         let reloadScheduled = false;

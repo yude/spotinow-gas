@@ -943,7 +943,7 @@
         let frameCount = 0;
         function update() {
           frameCount++;
-          if (frameCount % 120 === 0) console.log('Ticker running...', currentMs, '/', durationMs);
+          if (frameCount % 120 === 0) console.log('Ticker running...', startProgressMs + (Date.now() - startTime), '/', durationMs);
           if (!document.body.contains(container)) {
              console.log('Container detached, stopping animation loop');
              return;

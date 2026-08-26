@@ -941,6 +941,10 @@
         }
 
         function update() {
+          if (!document.body.contains(container)) {
+             console.log('Container detached, stopping animation loop');
+             return;
+          }
           const elapsed = Date.now() - startTime;
           const currentMs = Math.min(durationMs, startProgressMs + elapsed);
           const percent = Math.min(100, (currentMs / durationMs) * 100);
@@ -960,6 +964,19 @@
         tickerFrameId = requestAnimationFrame(update);
       }
       document.addEventListener('DOMContentLoaded', initSeekBarTicker); window.addEventListener('load', initSeekBarTicker);
+
+      // Ensure the ticker starts even if events are missed
+      const observer = new MutationObserver((mutations, obs) => {
+        if (document.getElementById('progress-container')) {
+          if (!tickerFrameId) {
+            console.log('MutationObserver detected progress-container, initializing ticker...');
+            initSeekBarTicker();
+          }
+          obs.disconnect();
+        }
+      });
+      observer.observe(document, { childList: true, subtree: true });
+
     </script>
   </head>
   <body>

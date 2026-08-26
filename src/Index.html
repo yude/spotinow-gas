@@ -940,7 +940,10 @@
           return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
         }
 
+        let frameCount = 0;
         function update() {
+          frameCount++;
+          if (frameCount % 120 === 0) console.log('Ticker running...', currentMs, '/', durationMs);
           if (!document.body.contains(container)) {
              console.log('Container detached, stopping animation loop');
              return;
@@ -955,6 +958,7 @@
           if (currentMs < durationMs) {
             tickerFrameId = requestAnimationFrame(update);
           } else if (!reloadScheduled) {
+            console.log('Reached end of track! currentMs:', currentMs, 'durationMs:', durationMs);
             reloadScheduled = true;
             // 楽曲が終了（100%到達）してから 5 秒後に自動リロード
             tickerTimeoutId = setTimeout(() => { reloadDashboardSeamlessly(); }, 5000);
